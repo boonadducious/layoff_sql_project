@@ -1,0 +1,37 @@
+ WITH clean_all AS (
+    SELECT 
+      company,
+      EXTRACT(year FROM real_date) AS year,
+      EXTRACT(month FROM real_date) AS month,
+      percentage,
+      total_layoffs,
+      industry, 
+      status,
+      headquarter_location
+    FROM 
+      (SELECT 
+         company,
+          CAST(reported_date AS DATE) AS real_date,
+          impacted_workforce_percentage AS percentage,
+          total_layoffs,
+          industry, 
+          status,
+          headquarter_location
+       FROM `thing-thing-344314.tech_layoffs.2022_2023`)),
+
+ company_names AS (
+    SELECT DISTINCT company 
+    FROM thing-thing-344314.tech_layoffs.2022_2023
+  ),
+  company_numbers AS (
+    SELECT 
+      company, 
+      DENSE_RANK() OVER (ORDER BY company) AS company_number
+    FROM company_names
+  ),
+
+numbered_companies AS (
+  SELECT * 
+FROM clean_all AS c
+  INNER JOIN company_numbers AS num
+  ON num.company = c.company)
